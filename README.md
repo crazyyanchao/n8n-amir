@@ -1,5 +1,8 @@
 # n8n-amir
 
+[![English](https://img.shields.io/badge/English-Click-yellow)](README.md)
+[![中文文档](https://img.shields.io/badge/中文文档-点击查看-orange)](README-zh.md)
+
 To support executing more script commands (mainly Python) in n8n Execute Command nodes, this project is based on the n8n Docker image with custom secondary packaging, extending the official image content.
 
 The data volume section retains n8n_data, and adds n8n_workspace and n8n_pipx. When operating in n8n Execute Command nodes, any files created are in the `/workspace` directory, which needs to be persisted through the n8n_workspace data volume. When operating pipx commands in n8n Execute Command nodes to install executable CLIs, these CLI-related contents will also be persisted to n8n_pipx, ensuring that user-installed executable CLIs are not lost when upgrading Docker containers.

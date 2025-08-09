@@ -1,5 +1,8 @@
 # n8n-amir
 
+[![English](https://img.shields.io/badge/English-Click-yellow)](README.md)
+[![中文文档](https://img.shields.io/badge/中文文档-点击查看-orange)](README-zh.md)
+
 为了支持在 n8n Execute Command 节点中执行更多脚本命令（主要是Python），这个项目基于n8n Docker 镜像自定义二次打包，扩展了官方镜像内容。
 
 数据卷部分保留了n8n_data，新增了n8n_workspace和n8n_pipx。在 n8n Execute Command 节点操作时任何创建的文件都在`/workspace`目录下，需要通过n8n_workspace数据卷持久化。在 n8n Execute Command 节点操作pipx命令安装可执行CLI时，这些CLI相关内容也会被持久化到n8n_pipx，这样做的目的升级Docker容器时保证用户安装的可执行CLI不丢失。
