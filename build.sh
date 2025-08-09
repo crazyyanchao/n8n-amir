@@ -17,6 +17,3 @@ docker build \
     --build-arg BUILDKIT_INLINE_CACHE=1 \
     --cache-from $IMAGE_NAME:$TAG \
     .
-
-# 推送镜像（可选）
-# docker push $IMAGE_NAME:$TAG

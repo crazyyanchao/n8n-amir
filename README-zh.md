@@ -37,7 +37,8 @@
 ### 镜像打包与发布
 
 ```bash
-.\build.sh
+.\build.sh      # Local
+.\build-prd.sh  # Remote
 ```
 
 ### 使用 Docker Compose
