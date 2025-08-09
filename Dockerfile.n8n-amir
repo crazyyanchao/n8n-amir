@@ -1,6 +1,16 @@
 # 多阶段构建 Dockerfile
 FROM docker.n8n.io/n8nio/n8n AS base
 
+# 添加镜像元数据标签
+LABEL maintainer="grapher01110"
+LABEL description="Enhanced n8n workflow automation platform with Python development tools"
+LABEL version="1.0.0"
+LABEL org.opencontainers.image.title="n8n-amir"
+LABEL org.opencontainers.image.description="A comprehensive n8n Docker image with Python development environment, multiple Python versions, and development tools"
+LABEL org.opencontainers.image.vendor="grapher01110"
+LABEL org.opencontainers.image.source="https://github.com/crazyyanchao/n8n-amir"
+LABEL org.opencontainers.image.licenses="MIT"
+
 USER root
 
 # 基础依赖安装

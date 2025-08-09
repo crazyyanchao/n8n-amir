@@ -17,7 +17,7 @@ fi
 
 VERSION=$1
 LATEST_TAG="latest"
-VERSION_TAG="v$VERSION"
+VERSION_TAG="$VERSION"
 
 # 设置 Docker Hub 用户名（请根据实际情况修改）
 DOCKER_USERNAME="grapher01110"
@@ -49,8 +49,18 @@ if ! docker info | grep -q "Username"; then
 fi
 
 # 拉取最新基础镜像
-echo "拉取最新基础镜像..."
-docker pull $BASE_IMAGE:latest
+echo "拉取基础镜像 $BASE_IMAGE:$VERSION_TAG..."
+docker pull $BASE_IMAGE:$VERSION_TAG
+
+# 如果指定版本不存在，则拉取最新版本作为备选
+if [ $? -ne 0 ]; then
+    echo "警告: 指定版本 $VERSION_TAG 不存在，拉取最新版本..."
+    docker pull $BASE_IMAGE:latest
+    if [ $? -ne 0 ]; then
+        echo "错误: 无法拉取基础镜像"
+        exit 1
+    fi
+fi
 
 # 删除现有镜像（如果存在）
 echo "清理现有镜像..."

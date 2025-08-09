@@ -4,6 +4,8 @@
 
 数据卷部分保留了n8n_data，新增了n8n_workspace和n8n_pipx。在 n8n Execute Command 节点操作时任何创建的文件都在`/workspace`目录下，需要通过n8n_workspace数据卷持久化。在 n8n Execute Command 节点操作pipx命令安装可执行CLI时，这些CLI相关内容也会被持久化到n8n_pipx，这样做的目的升级Docker容器时保证用户安装的可执行CLI不丢失。
 
+这里是一个n8n工作流模板，[n8n最新镜像文件监控并发送邮件提醒](https://github.com/crazyyanchao/n8n-workflow-template/tree/main/workflows/docker-n8n-update-notice)。其中用到了自定义镜像n8n-amir中 n8n Execute Command 节点执行的效果的展示。
+
 ## 扩展镜像的主要内容
 
 - ✅ **基于官方 n8n 镜像** (`docker.n8n.io/n8nio/n8n`)

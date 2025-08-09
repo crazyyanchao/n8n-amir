@@ -4,6 +4,8 @@ To support executing more script commands (mainly Python) in n8n Execute Command
 
 The data volume section retains n8n_data, and adds n8n_workspace and n8n_pipx. When operating in n8n Execute Command nodes, any files created are in the `/workspace` directory, which needs to be persisted through the n8n_workspace data volume. When operating pipx commands in n8n Execute Command nodes to install executable CLIs, these CLI-related contents will also be persisted to n8n_pipx, ensuring that user-installed executable CLIs are not lost when upgrading Docker containers.
 
+Here is an n8n workflow template: [n8n Latest Image File Monitoring and Email Notification](https://github.com/crazyyanchao/n8n-workflow-template/tree/main/workflows/docker-n8n-update-notice). It demonstrates the effects of using the custom image n8n-amir in n8n Execute Command nodes.
+
 ## Extended Image Main Content
 
 - ✅ **Based on official n8n image** (`docker.n8n.io/n8nio/n8n`)
