@@ -9,6 +9,9 @@ RUN apk --no-cache add \
     python3 \
     python3-dev \
     py3-pip \
+    py3-setuptools \
+    py3-wheel \
+    py3-virtualenv \
     build-base \
     libffi-dev \
     openssl-dev \
@@ -20,7 +23,24 @@ RUN apk --no-cache add \
     zip \
     tar \
     gzip \
-    bash
+    bash \
+    vim \
+    jq \
+    tree \
+    less \
+    procps \
+    util-linux \
+    rsync \
+    gcc \
+    g++ \
+    musl-dev \
+    linux-headers \
+    openblas-dev \
+    lapack-dev \
+    py3-numpy \
+    py3-pandas \
+    htop \
+    ncdu 
 
 # 设置 bash 为默认 shell
 RUN ln -sf /bin/bash /bin/sh
@@ -28,17 +48,16 @@ RUN ln -sf /bin/bash /bin/sh
 # uv 安装阶段
 FROM deps AS uv-setup
 # 使用官方推荐的 uv 安装方式
-RUN pip3 install --no-cache-dir --break-system-packages uv==0.8.6
+RUN pip3 install --no-cache-dir --break-system-packages uv
+
+# pipx 安装阶段
+FROM uv-setup AS pipx-setup
+RUN pip3 install --no-cache-dir --break-system-packages pipx
 
 # Python 版本安装阶段
-FROM uv-setup AS python-setup
+FROM pipx-setup AS python-setup
 USER node
 WORKDIR /workspace
-
-# 设置 uv 环境变量
-ENV UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
-ENV UV_CONCURRENT_DOWNLOADS=20
-ENV UV_TIMEOUT=120
 
 # 并行安装多个 Python 版本
 RUN uv python install 3.10 & \
@@ -57,7 +76,9 @@ RUN mkdir -p /workspace && \
     chown -R node:node /workspace
 
 # 创建安全的 rm 包装脚本
-RUN mkdir -p /home/node/.local/bin && \
+RUN mkdir -p /home/node/.local/share/pipx/bin && \
+    chown -R node:node /home/node/.local/share && \
+    mkdir -p /home/node/.local/bin && \
     echo '#!/bin/bash' > /home/node/.local/bin/rm && \
     echo 'if echo "$*" | grep -q -- "-rf\|-r -f\|-f -r"; then' >> /home/node/.local/bin/rm && \
     echo '    echo "Error: rm -rf is not allowed for security reasons"' >> /home/node/.local/bin/rm && \
@@ -72,11 +93,22 @@ USER node
 WORKDIR /workspace
 
 # 将自定义 bin 目录添加到 PATH 的最前面
-ENV PATH="/home/node/.local/bin:$PATH"
+ENV PATH="/home/node/.local/bin:/home/node/.local/share/pipx/bin:$PATH"
 # 设置默认 shell 为 bash
 ENV SHELL=/bin/bash
+# 设置 uv 使用复制模式，避免硬链接警告
+ENV UV_LINK_MODE=copy
+# 确保 pipx 环境变量在最终镜像中设置
+ENV PIPX_HOME=/home/node/.local/share/pipx/home
+ENV PIPX_BIN_DIR=/home/node/.local/share/pipx/bin
 
 # 验证安装并清理缓存
 RUN uv --version && \
     uv python list && \
     uv cache clean
+
+# 测试所有 Python 版本的虚拟环境功能
+RUN python3.10 -m venv --help && \
+    python3.11 -m venv --help && \
+    python3.12 -m venv --help && \
+    python3.13 -m venv --help
