@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "n8n-amir"
+version = "0.1.0"
+description = "n8n workflow automation project"
+authors = [
+    {name = "Amir", email = "amir@example.com"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = []
+
+[tool.uv]
+# 设置默认 PyPI 镜像源
+default-index = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+
+# 可选：设置其他 uv 配置
+[tool.uv.sources]
+# 可以在这里添加其他包源
+
+[tool.uv.dev-dependencies]
+# 开发依赖可以在这里添加 

@@ -1,0 +1,82 @@
+# 多阶段构建 Dockerfile
+FROM docker.n8n.io/n8nio/n8n AS base
+
+USER root
+
+# 基础依赖安装
+FROM base AS deps
+RUN apk --no-cache add \
+    python3 \
+    python3-dev \
+    py3-pip \
+    build-base \
+    libffi-dev \
+    openssl-dev \
+    cargo \
+    git \
+    curl \
+    wget \
+    unzip \
+    zip \
+    tar \
+    gzip \
+    bash
+
+# 设置 bash 为默认 shell
+RUN ln -sf /bin/bash /bin/sh
+
+# uv 安装阶段
+FROM deps AS uv-setup
+# 使用官方推荐的 uv 安装方式
+RUN pip3 install --no-cache-dir --break-system-packages uv==0.8.6
+
+# Python 版本安装阶段
+FROM uv-setup AS python-setup
+USER node
+WORKDIR /workspace
+
+# 设置 uv 环境变量
+ENV UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
+ENV UV_CONCURRENT_DOWNLOADS=20
+ENV UV_TIMEOUT=120
+
+# 并行安装多个 Python 版本
+RUN uv python install 3.10 & \
+    uv python install 3.11 & \
+    uv python install 3.12 & \
+    uv python install 3.13 & \
+    wait && \
+    uv python pin 3.12
+
+# 最终镜像
+FROM python-setup AS final
+USER root
+
+# 在根目录创建 workspace 目录并设置权限
+RUN mkdir -p /workspace && \
+    chown -R node:node /workspace
+
+# 创建安全的 rm 包装脚本
+RUN mkdir -p /home/node/.local/bin && \
+    echo '#!/bin/bash' > /home/node/.local/bin/rm && \
+    echo 'if echo "$*" | grep -q -- "-rf\|-r -f\|-f -r"; then' >> /home/node/.local/bin/rm && \
+    echo '    echo "Error: rm -rf is not allowed for security reasons"' >> /home/node/.local/bin/rm && \
+    echo '    echo "Please delete files individually instead"' >> /home/node/.local/bin/rm && \
+    echo '    exit 1' >> /home/node/.local/bin/rm && \
+    echo 'fi' >> /home/node/.local/bin/rm && \
+    echo 'exec /bin/rm "$@"' >> /home/node/.local/bin/rm && \
+    chmod +x /home/node/.local/bin/rm && \
+    chown node:node /home/node/.local/bin/rm
+
+USER node
+WORKDIR /workspace
+
+# 将自定义 bin 目录添加到 PATH 的最前面
+ENV PATH="/home/node/.local/bin:$PATH"
+# 设置默认 shell 为 bash
+ENV SHELL=/bin/bash
+
+# 验证安装并清理缓存
+RUN uv --version && \
+    uv python list && \
+    uv cache clean

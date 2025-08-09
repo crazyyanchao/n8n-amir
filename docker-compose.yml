@@ -1,0 +1,34 @@
+services:
+  n8n-amir:
+    build:
+      context: .
+      dockerfile: Dockerfile.n8n-amir
+    image: n8n-amir:latest
+    container_name: n8n-amir
+    restart: unless-stopped
+    user: "node"
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_WEBHOOK_URL=http://localhost:5678/
+  
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
+      
+      - GENERIC_TIMEZONE=Asia/Shanghai
+      
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - n8n_workspace:/workspace
+    working_dir: /workspace
+
+volumes:
+  n8n_data:
+    name: n8n_data
+    external: true
+  n8n_workspace:
+    name: n8n_workspace
+    external: true
