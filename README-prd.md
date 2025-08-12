@@ -98,6 +98,36 @@ N8N_TEMPLATES_ENABLED=false
 N8N_DIAGNOSTICS_CONFIG_FRONTEND=""
 N8N_DIAGNOSTICS_CONFIG_BACKEND=""
 EXTERNAL_FRONTEND_HOOKS_URLS=""
+N8N_LICENSE_AUTO_RENEW_ENABLED=false
+N8N_LICENSE_SERVER_URL=""
+
+# 直接使用Docker命令离线启动
+docker run -d \
+  --name n8n-amir \
+  --restart unless-stopped \
+  -p 5678:5678 \
+  -e N8N_HOST=127.0.0.1 \
+  -e N8N_PORT=5678 \
+  -e N8N_PROTOCOL=http \
+  -e N8N_WEBHOOK_URL=http://127.0.0.1:5678/ \
+  -e N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true \
+  -e N8N_RUNNERS_ENABLED=true \
+  -e N8N_SECURE_COOKIE=false \
+  -e N8N_DIAGNOSTICS_ENABLED=false \
+  -e N8N_VERSION_NOTIFICATIONS_ENABLED=false \
+  -e N8N_TEMPLATES_ENABLED=false \
+  -e N8N_LICENSE_AUTO_RENEW_ENABLED=false \
+  -e N8N_LICENSE_SERVER_URL= \
+  -e N8N_DIAGNOSTICS_CONFIG_FRONTEND= \
+  -e N8N_DIAGNOSTICS_CONFIG_BACKEND= \
+  -e EXTERNAL_FRONTEND_HOOKS_URLS= \
+  -e GENERIC_TIMEZONE=Asia/Shanghai \
+  -v n8n_data:/home/node/.n8n \
+  -v n8n_workspace:/workspace \
+  -v n8n_pipx:/home/node/.local/share/pipx \
+  --user node \
+  --workdir /workspace \
+  grapher01110/n8n-amir:latest
 ```
 
 ### 数据卷
