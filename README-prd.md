@@ -90,6 +90,16 @@ docker-compose -f docker-compose-prd.yml up -d --force-recreate
 - `N8N_RUNNERS_ENABLED`: 启用运行器
 - `GENERIC_TIMEZONE`: 时区设置 (Asia/Shanghai)
 
+```bash
+# 离线模式下的几个必要配置
+N8N_DIAGNOSTICS_ENABLED=false
+N8N_VERSION_NOTIFICATIONS_ENABLED=false
+N8N_TEMPLATES_ENABLED=false
+N8N_DIAGNOSTICS_CONFIG_FRONTEND=""
+N8N_DIAGNOSTICS_CONFIG_BACKEND=""
+EXTERNAL_FRONTEND_HOOKS_URLS=""
+```
+
 ### 数据卷
 - `n8n_data`: N8N配置和数据存储
 - `n8n_workspace`: 工作空间文件
