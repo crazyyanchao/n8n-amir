@@ -1,5 +1,6 @@
 # 多阶段构建 Dockerfile
 ARG N8N_VERSION=latest
+ARG UNLOCK_MODE=false
 FROM docker.n8n.io/n8nio/n8n:${N8N_VERSION} AS base
 
 # 添加镜像元数据标签
@@ -55,8 +56,21 @@ RUN apk --no-cache add \
 # 设置 bash 为默认 shell
 RUN ln -sf /bin/bash /bin/sh
 
+# 许可证注入阶段（仅在 unlock 模式下执行）
+FROM deps AS license-inject
+ARG UNLOCK_MODE
+RUN if [ "$UNLOCK_MODE" = "true" ]; then \
+        echo "执行许可证注入操作..." && \
+        npm install -g n8n-inject-license-sdk@^2.21.1 && \
+        rm -rf /usr/local/lib/node_modules/n8n/node_modules/@n8n_io/license-sdk && \
+        ln -s /usr/local/lib/node_modules/n8n-inject-license-sdk /usr/local/lib/node_modules/n8n/node_modules/@n8n_io/license-sdk && \
+        echo "许可证注入操作完成"; \
+    else \
+        echo "跳过许可证注入操作"; \
+    fi
+
 # uv 安装阶段
-FROM deps AS uv-setup
+FROM license-inject AS uv-setup
 # 使用官方推荐的 uv 安装方式
 RUN pip3 install --no-cache-dir --break-system-packages uv
 

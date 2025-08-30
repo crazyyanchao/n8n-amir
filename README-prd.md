@@ -202,6 +202,7 @@ docker-compose -f docker-compose-prd.yml down
 
 # 3. 重新启动服务
 docker-compose -f docker-compose-prd.yml up -d
+docker-compose -f docker-compose-prd-unlock.yml up -d
 
 # 4. 清理旧镜像（可选）
 docker image prune -f

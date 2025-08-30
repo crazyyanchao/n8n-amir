@@ -1,7 +1,9 @@
 #!/bin/bash
 
 # 生产环境构建脚本 - 发布到 Docker Hub
-# 使用方法: ./build-prd.sh [版本号]
+# 使用方法: ./build-prd.sh [版本号] [unlock]
+# 例如-构建社区版镜像: ./build-prd.sh 1.109.1
+# 例如-构建企业版镜像: ./build-prd.sh 1.109.1 unlock
 
 # 设置构建参数
 IMAGE_NAME="n8n-amir"
@@ -10,12 +12,22 @@ BASE_IMAGE="docker.n8n.io/n8nio/n8n"
 
 # 检查是否提供了版本号参数
 if [ $# -eq 0 ]; then
-    echo "请提供版本号: ./build-prd.sh <版本号>"
+    echo "请提供版本号: ./build-prd.sh <版本号> [unlock]"
     echo "例如: ./build-prd.sh 1.105.4"
+    echo "      ./build-prd.sh 1.105.4 unlock"
     exit 1
 fi
 
 VERSION=$1
+UNLOCK_MODE=""
+
+# 检查是否提供了 unlock 参数
+if [ $# -eq 2 ] && [ "$2" = "unlock" ]; then
+    UNLOCK_MODE="unlock"
+    IMAGE_NAME="n8n-amir-unlock"
+    echo "检测到 unlock 模式，镜像名称将设置为: $IMAGE_NAME"
+fi
+
 LATEST_TAG="latest"
 VERSION_TAG="$VERSION"
 
@@ -29,6 +41,9 @@ echo "镜像名称: $FULL_IMAGE_NAME"
 echo "版本: $VERSION_TAG"
 echo "最新标签: $LATEST_TAG"
 echo "基础镜像: $BASE_IMAGE"
+if [ "$UNLOCK_MODE" = "unlock" ]; then
+    echo "构建模式: unlock (包含许可证注入功能)"
+fi
 echo "=========================================="
 
 # 检查 Docker 是否运行
@@ -69,13 +84,25 @@ docker rmi $FULL_IMAGE_NAME:$LATEST_TAG 2>/dev/null || echo "最新镜像不存�
 
 # 构建版本镜像
 echo "构建版本镜像 $FULL_IMAGE_NAME:$VERSION_TAG..."
-docker build \
-    --file $DOCKERFILE \
-    --build-arg N8N_VERSION=$VERSION_TAG \
-    --tag $FULL_IMAGE_NAME:$VERSION_TAG \
-    --tag $FULL_IMAGE_NAME:$LATEST_TAG \
-    --no-cache \
-    .
+if [ "$UNLOCK_MODE" = "unlock" ]; then
+    echo "使用 unlock 模式构建，包含许可证注入功能..."
+    docker build \
+        --file $DOCKERFILE \
+        --build-arg N8N_VERSION=$VERSION_TAG \
+        --build-arg UNLOCK_MODE=true \
+        --tag $FULL_IMAGE_NAME:$VERSION_TAG \
+        --tag $FULL_IMAGE_NAME:$LATEST_TAG \
+        --no-cache \
+        .
+else
+    docker build \
+        --file $DOCKERFILE \
+        --build-arg N8N_VERSION=$VERSION_TAG \
+        --tag $FULL_IMAGE_NAME:$VERSION_TAG \
+        --tag $FULL_IMAGE_NAME:$LATEST_TAG \
+        --no-cache \
+        .
+fi
 
 # 检查构建是否成功
 if [ $? -ne 0 ]; then
