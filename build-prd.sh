@@ -71,6 +71,7 @@ docker rmi $FULL_IMAGE_NAME:$LATEST_TAG 2>/dev/null || echo "最新镜像不存�
 echo "构建版本镜像 $FULL_IMAGE_NAME:$VERSION_TAG..."
 docker build \
     --file $DOCKERFILE \
+    --build-arg N8N_VERSION=$VERSION_TAG \
     --tag $FULL_IMAGE_NAME:$VERSION_TAG \
     --tag $FULL_IMAGE_NAME:$LATEST_TAG \
     --no-cache \

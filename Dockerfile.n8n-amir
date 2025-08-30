@@ -1,5 +1,6 @@
 # 多阶段构建 Dockerfile
-FROM docker.n8n.io/n8nio/n8n AS base
+ARG N8N_VERSION=latest
+FROM docker.n8n.io/n8nio/n8n:${N8N_VERSION} AS base
 
 # 添加镜像元数据标签
 LABEL maintainer="grapher01110"
@@ -24,7 +25,6 @@ RUN apk --no-cache add \
     py3-virtualenv \
     build-base \
     libffi-dev \
-    openssl-dev \
     cargo \
     git \
     curl \
