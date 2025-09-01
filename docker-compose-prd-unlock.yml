@@ -1,7 +1,7 @@
 services:
   n8n-amir-unlock:
     image: grapher01110/n8n-amir-unlock:latest
-    container_name: n8n-amir-unlock-unlock
+    container_name: n8n-amir-unlock
     restart: unless-stopped
     user: "node"
     ports:
