@@ -51,7 +51,8 @@ RUN apk --no-cache add \
     py3-numpy \
     py3-pandas \
     htop \
-    ncdu 
+    ncdu \
+    antiword 
 
 # 设置 bash 为默认 shell
 RUN ln -sf /bin/bash /bin/sh
