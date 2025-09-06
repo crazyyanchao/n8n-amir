@@ -52,7 +52,8 @@ RUN apk --no-cache add \
     py3-pandas \
     htop \
     ncdu \
-    antiword 
+    antiword \
+    ffmpeg
 
 # 设置 bash 为默认 shell
 RUN ln -sf /bin/bash /bin/sh
